@@ -1,13 +1,13 @@
-/* Ashramam Vibes - Black and White Vintage Theme */
+/* Ashramam Vibes - Clean White Theme */
 
 :root {
     --black: #000000;
     --white: #ffffff;
-    --light-gray: #f5f5f5;
-    --medium-gray: #cccccc;
+    --light-gray: #f8f8f8;
+    --medium-gray: #e0e0e0;
     --dark-gray: #333333;
-    --shadow: rgba(0, 0, 0, 0.2);
-    --border: #999999;
+    --shadow: rgba(0, 0, 0, 0.1);
+    --border: #cccccc;
 }
 
 * {
@@ -19,20 +19,18 @@
 body {
     font-family: 'Times New Roman', serif;
     line-height: 1.6;
-    color: var(--dark-gray);
+    color: var(--black);
     background-color: var(--white);
-    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text fill="%23999999" font-size="20" y="50%">✦</text></svg>');
-    background-size: 50px 50px;
     min-height: 100vh;
 }
 
 header {
-    background-color: var(--black);
-    color: var(--white);
+    background-color: var(--white);
+    color: var(--black);
     text-align: center;
     padding: 2rem 1rem;
-    border-bottom: 5px solid var(--medium-gray);
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+    border-bottom: 3px solid var(--border);
+    box-shadow: 0 2px 5px var(--shadow);
 }
 
 header h1 {
@@ -48,10 +46,9 @@ header p {
 }
 
 nav {
-    background-color: var(--light-gray);
+    background-color: var(--white);
     padding: 1rem;
-    border-top: 2px solid var(--medium-gray);
-    border-bottom: 2px solid var(--medium-gray);
+    border-bottom: 1px solid var(--border);
 }
 
 nav ul {
@@ -86,10 +83,10 @@ main {
 section {
     margin-bottom: 3rem;
     padding: 2rem;
-    background-color: var(--light-gray);
-    border: 3px solid var(--border);
+    background-color: var(--white);
+    border: none;
     border-radius: 0;
-    box-shadow: 5px 5px 15px var(--shadow);
+    box-shadow: none;
 }
 
 section h2 {
@@ -104,7 +101,7 @@ section h2 {
 section p {
     margin-bottom: 1rem;
     text-align: center;
-    color: var(--dark-gray);
+    color: var(--black);
 }
 
 .hero-image {
@@ -116,12 +113,11 @@ section p {
     width: 100%;
     max-width: 800px;
     height: auto;
-    border: 3px solid var(--border);
+    border: none;
     border-radius: 0;
-    box-shadow: 5px 5px 15px var(--shadow);
+    box-shadow: none;
     display: block;
     margin: 0 auto;
-    filter: grayscale(1);
 }
 
 .placeholder {
@@ -162,7 +158,7 @@ section p {
 }
 
 .feature p {
-    color: var(--dark-gray);
+    color: var(--black);
 }
 
 .gallery {
@@ -198,10 +194,9 @@ section p {
     width: 100%;
     height: 200px;
     object-fit: cover;
-    border: 2px solid var(--border);
+    border: none;
     border-radius: 0;
-    box-shadow: 3px 3px 10px var(--shadow);
-    filter: grayscale(1);
+    box-shadow: none;
     transition: transform 0.3s ease;
 }
 
@@ -225,7 +220,7 @@ article h3 {
 
 article p {
     margin-bottom: 1.5rem;
-    color: var(--dark-gray);
+    color: var(--black);
     text-align: justify;
 }
 
@@ -267,12 +262,12 @@ button:hover {
 }
 
 footer {
-    background-color: var(--black);
-    color: var(--white);
+    background-color: var(--white);
+    color: var(--black);
     text-align: center;
     padding: 1rem;
     margin-top: 2rem;
-    border-top: 3px solid var(--medium-gray);
+    border-top: 1px solid var(--border);
 }
 
 @media (max-width: 768px) {
@@ -316,5 +311,5 @@ footer {
 }
 
 .comment-text {
-    color: var(--dark-gray);
+    color: var(--black);
 }
