@@ -1,14 +1,13 @@
-/* Ashramam Vibes - Vintage Theme */
+/* Ashramam Vibes - Black and White Vintage Theme */
 
 :root {
-    --sepia-brown: #8b4513;
-    --faded-gold: #daa520;
-    --cream: #f5f5dc;
-    --parchment: #f4e4bc;
-    --dark-brown: #654321;
-    --muted-green: #556b2f;
-    --shadow: rgba(139, 69, 19, 0.2);
-    --border: #d2b48c;
+    --black: #000000;
+    --white: #ffffff;
+    --light-gray: #f5f5f5;
+    --medium-gray: #cccccc;
+    --dark-gray: #333333;
+    --shadow: rgba(0, 0, 0, 0.2);
+    --border: #999999;
 }
 
 * {
@@ -20,19 +19,19 @@
 body {
     font-family: 'Times New Roman', serif;
     line-height: 1.6;
-    color: var(--dark-brown);
-    background-color: var(--parchment);
-    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text fill="%23d2b48c" font-size="20" y="50%">✦</text></svg>');
+    color: var(--dark-gray);
+    background-color: var(--white);
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text fill="%23999999" font-size="20" y="50%">✦</text></svg>');
     background-size: 50px 50px;
     min-height: 100vh;
 }
 
 header {
-    background-color: var(--sepia-brown);
-    color: var(--cream);
+    background-color: var(--black);
+    color: var(--white);
     text-align: center;
     padding: 2rem 1rem;
-    border-bottom: 5px solid var(--faded-gold);
+    border-bottom: 5px solid var(--medium-gray);
     box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
 }
 
@@ -49,10 +48,10 @@ header p {
 }
 
 nav {
-    background-color: var(--faded-gold);
+    background-color: var(--light-gray);
     padding: 1rem;
-    border-top: 2px solid var(--sepia-brown);
-    border-bottom: 2px solid var(--sepia-brown);
+    border-top: 2px solid var(--medium-gray);
+    border-bottom: 2px solid var(--medium-gray);
 }
 
 nav ul {
@@ -63,19 +62,19 @@ nav ul {
 }
 
 nav a {
-    color: var(--dark-brown);
+    color: var(--dark-gray);
     text-decoration: none;
     font-weight: bold;
     padding: 0.5rem 1rem;
-    border: 2px solid var(--sepia-brown);
-    background-color: var(--cream);
+    border: 2px solid var(--medium-gray);
+    background-color: var(--white);
     border-radius: 0;
     transition: background-color 0.3s ease;
 }
 
 nav a:hover {
-    background-color: var(--sepia-brown);
-    color: var(--cream);
+    background-color: var(--medium-gray);
+    color: var(--white);
 }
 
 main {
@@ -87,14 +86,14 @@ main {
 section {
     margin-bottom: 3rem;
     padding: 2rem;
-    background-color: var(--parchment);
+    background-color: var(--light-gray);
     border: 3px solid var(--border);
     border-radius: 0;
     box-shadow: 5px 5px 15px var(--shadow);
 }
 
 section h2 {
-    color: var(--sepia-brown);
+    color: var(--black);
     margin-bottom: 1rem;
     text-align: center;
     font-size: 2.5rem;
@@ -105,7 +104,7 @@ section h2 {
 section p {
     margin-bottom: 1rem;
     text-align: center;
-    color: var(--dark-brown);
+    color: var(--dark-gray);
 }
 
 .hero-image {
@@ -122,19 +121,19 @@ section p {
     box-shadow: 5px 5px 15px var(--shadow);
     display: block;
     margin: 0 auto;
-    filter: sepia(0.3) contrast(1.1) brightness(0.9);
+    filter: grayscale(1);
 }
 
 .placeholder {
     width: 100%;
     max-width: 600px;
     height: 300px;
-    background-color: var(--sage-green);
+    background-color: var(--medium-gray);
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--white);
+    color: var(--black);
     font-size: 1.5rem;
     margin: 0 auto;
     box-shadow: 0 4px 10px var(--shadow);
@@ -150,20 +149,20 @@ section p {
 .feature {
     text-align: center;
     padding: 1.5rem;
-    background-color: var(--cream);
+    background-color: var(--white);
     border: 2px solid var(--border);
     border-radius: 0;
     box-shadow: 3px 3px 10px var(--shadow);
 }
 
 .feature h3 {
-    color: var(--sepia-brown);
+    color: var(--black);
     margin-bottom: 1rem;
     font-family: 'Georgia', serif;
 }
 
 .feature p {
-    color: var(--dark-brown);
+    color: var(--dark-gray);
 }
 
 .gallery {
@@ -202,7 +201,7 @@ section p {
     border: 2px solid var(--border);
     border-radius: 0;
     box-shadow: 3px 3px 10px var(--shadow);
-    filter: sepia(0.4) contrast(1.2) brightness(0.8);
+    filter: grayscale(1);
     transition: transform 0.3s ease;
 }
 
@@ -217,7 +216,7 @@ article {
 }
 
 article h3 {
-    color: var(--sepia-brown);
+    color: var(--black);
     margin-bottom: 1.5rem;
     font-size: 1.8rem;
     text-align: center;
@@ -226,7 +225,7 @@ article h3 {
 
 article p {
     margin-bottom: 1.5rem;
-    color: var(--dark-brown);
+    color: var(--dark-gray);
     text-align: justify;
 }
 
@@ -240,7 +239,7 @@ form {
 
 input, textarea {
     padding: 0.8rem;
-    border: 2px solid var(--sage-green);
+    border: 2px solid var(--medium-gray);
     border-radius: 5px;
     font-size: 1rem;
     transition: border-color 0.3s ease;
@@ -248,13 +247,13 @@ input, textarea {
 
 input:focus, textarea:focus {
     outline: none;
-    border-color: var(--primary-green);
+    border-color: var(--black);
 }
 
 button {
     padding: 0.8rem;
-    background-color: var(--primary-green);
-    color: var(--white);
+    background-color: var(--medium-gray);
+    color: var(--black);
     border: none;
     border-radius: 5px;
     font-size: 1rem;
@@ -263,16 +262,17 @@ button {
 }
 
 button:hover {
-    background-color: var(--light-green);
+    background-color: var(--black);
+    color: var(--white);
 }
 
 footer {
-    background-color: var(--sepia-brown);
-    color: var(--cream);
+    background-color: var(--black);
+    color: var(--white);
     text-align: center;
     padding: 1rem;
     margin-top: 2rem;
-    border-top: 3px solid var(--faded-gold);
+    border-top: 3px solid var(--medium-gray);
 }
 
 @media (max-width: 768px) {
@@ -301,7 +301,7 @@ footer {
 }
 
 .comment {
-    background-color: var(--cream);
+    background-color: var(--white);
     border: 2px solid var(--border);
     padding: 1rem;
     border-radius: 0;
@@ -309,12 +309,12 @@ footer {
 }
 
 .comment-author {
-    color: var(--sepia-brown);
+    color: var(--black);
     font-weight: bold;
     margin-bottom: 0.5rem;
     font-family: 'Georgia', serif;
 }
 
 .comment-text {
-    color: var(--dark-brown);
+    color: var(--dark-gray);
 }
