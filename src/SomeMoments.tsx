@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import BottomNavigation from './BottomNavigation';
+import { MOMENT_ARTICLES } from './someMomentArticles';
 
 interface Moment {
   slug: string;
@@ -222,7 +223,42 @@ const SomeMoments: React.FC = () => {
           Some Moments
         </h1>
 
-        {MOMENTS.length === 0 && (
+        {MOMENT_ARTICLES.map((a) => (
+          <div
+            key={a.slug}
+            onClick={() => navigate(`/some-moment/${a.slug}`)}
+            style={{
+              background: '#ffffff',
+              border: '1px solid #d9d9d9',
+              borderRadius: '12px',
+              padding: '16px',
+              marginBottom: '16px',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
+              cursor: 'pointer'
+            }}
+          >
+            <img
+              src={a.image}
+              alt={a.title}
+              style={{
+                width: '100%',
+                display: 'block',
+                borderRadius: '8px',
+                marginBottom: '12px'
+              }}
+            />
+            <h3 style={{
+              fontSize: '18px',
+              fontWeight: 400,
+              color: '#2f7fc4',
+              margin: 0
+            }}>
+              {a.title}
+            </h3>
+          </div>
+        ))}
+
+        {MOMENTS.length === 0 && MOMENT_ARTICLES.length === 0 && (
           <div style={{
             background: '#ffffff',
             border: '1px solid #d9d9d9',

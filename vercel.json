@@ -383,6 +383,17 @@
       "destination": "/api/og-moment"
     },
     {
+      "source": "/some-moment/:articleSlug",
+      "has": [
+        {
+          "type": "header",
+          "key": "User-Agent",
+          "value": ".*(WhatsApp|whatsapp|facebookexternalhit|Twitterbot|twitterbot|LinkedInBot|linkedinbot|TelegramBot|telegrambot|Discordbot|discordbot|Slackbot|slackbot|Pinterest|pinterest|Embedly|embedly).*"
+        }
+      ],
+      "destination": "/api/og-moment?article=:articleSlug"
+    },
+    {
       "source": "/some-moment/",
       "has": [
         {

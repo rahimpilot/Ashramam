@@ -1,17 +1,18 @@
 // api/og-moment.js
 //
-// Dynamic Open Graph preview for individual Some Moments videos.
+// Dynamic Open Graph preview for Some Moments videos and photo articles.
 //
-//   /api/og-moment?m=<slug>  -> HTML card with OG meta tags. Served to
-//                              WhatsApp / Facebook / Twitter crawlers
-//                              through a User-Agent rewrite in vercel.json.
-//                              Humans keep getting the SPA.
+//   /api/og-moment?m=<slug>        -> video card
+//   /api/og-moment?article=<slug>  -> article card
+// Served to WhatsApp / Facebook / Twitter crawlers through a User-Agent
+// rewrite in vercel.json. Humans keep getting the SPA.
 //
 // Unknown or missing slugs fall back to the generic Some Moments card.
 
 const SITE = 'https://www.ashramamvibes.com';
 const FALLBACK_TITLE = 'Some Moments | Ashramam';
 const FALLBACK_DESC = 'Short videos from the Ashramam crew — press play and watch right in the app. Tap to open.';
+const FALLBACK_ARTICLE_DESC = 'A story from the Ashramam crew — members only. Tap to open.';
 
 // Mirror of the video catalog in src/SomeMoments.tsx (slug -> { title, year, image }).
 const MOMENTS = {
@@ -19,6 +20,14 @@ const MOMENTS = {
     title: 'Selfie Fight',
     year: '2017',
     image: `${SITE}/videos/selfie-fight-2017-thumb.jpg`,
+  },
+};
+
+// Mirror of the article catalog in src/someMomentArticles.ts (slug -> { title, image }).
+const ARTICLES = {
+  'soccer-players': {
+    title: 'Soccer Players',
+    image: `${SITE}/images/soccer-players.jpg`,
   },
 };
 
@@ -32,41 +41,68 @@ const esc = (s) =>
     .replace(/"/g, '&quot;');
 
 module.exports = async (req, res) => {
-  const slug = String(req.query.m || '');
   const v = String(req.query.v || '');
+  const vParam = (sep) => (v ? `${sep}v=${encodeURIComponent(v)}` : '');
+
+  // Photo article card: /some-moment/<slug>
+  const articleSlug = String(req.query.article || '');
+  const art = ARTICLES[articleSlug];
+  if (art) {
+    return sendCard(res, {
+      pageTitle: `${art.title} | Ashramam Some Moments`,
+      desc: FALLBACK_ARTICLE_DESC,
+      pageUrl: `${SITE}/some-moment/${encodeURIComponent(articleSlug)}${vParam('?')}`,
+      image: art.image,
+      imgW: 1280,
+      imgH: 960,
+      cta: 'Continue to the story →',
+      takingTo: 'Taking you to the story…',
+    });
+  }
+
+  // Video card: /some-moment?m=<slug>
+  const slug = String(req.query.m || '');
   const moment = MOMENTS[slug];
   const titleText = moment ? `${moment.title}${moment.year ? ` (${moment.year})` : ''}` : null;
-  const pageTitle = titleText ? `${titleText} | Ashramam Some Moments` : FALLBACK_TITLE;
-  // Carry the ?v= cache-buster through so the shared URL and the card agree.
-  const vParam = v ? `&v=${encodeURIComponent(v)}` : '';
-  const pageUrl = moment
-    ? `${SITE}/some-moment?m=${encodeURIComponent(slug)}${vParam}`
-    : `${SITE}/some-moment`;
-  const image = moment ? moment.image : FALLBACK_IMAGE;
+  return sendCard(res, {
+    pageTitle: titleText ? `${titleText} | Ashramam Some Moments` : FALLBACK_TITLE,
+    desc: FALLBACK_DESC,
+    pageUrl: moment
+      ? `${SITE}/some-moment?m=${encodeURIComponent(slug)}${vParam('&')}`
+      : `${SITE}/some-moment`,
+    image: moment ? moment.image : FALLBACK_IMAGE,
+    imgW: 1080,
+    imgH: 1080,
+    cta: 'Continue to the video →',
+    takingTo: 'Taking you to the video…',
+  });
+};
+
+function sendCard(res, { pageTitle, desc, pageUrl, image, imgW, imgH, cta, takingTo }) {
 
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <title>${esc(pageTitle)}</title>
-  <meta name="description" content="${esc(FALLBACK_DESC)}" />
+  <meta name="description" content="${esc(desc)}" />
   <link rel="canonical" href="${esc(pageUrl)}" />
   <!-- Open Graph / WhatsApp / Facebook / LinkedIn / Telegram / Discord -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Ashramam - Community Network" />
   <meta property="og:url" content="${esc(pageUrl)}" />
   <meta property="og:title" content="${esc(pageTitle)}" />
-  <meta property="og:description" content="${esc(FALLBACK_DESC)}" />
+  <meta property="og:description" content="${esc(desc)}" />
   <meta property="og:image" content="${esc(image)}" />
   <meta property="og:image:secure_url" content="${esc(image)}" />
   <meta property="og:image:type" content="image/jpeg" />
-  <meta property="og:image:width" content="1080" />
-  <meta property="og:image:height" content="1080" />
+  <meta property="og:image:width" content="${imgW}" />
+  <meta property="og:image:height" content="${imgH}" />
   <meta property="og:image:alt" content="${esc(pageTitle)}" />
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="${esc(pageTitle)}" />
-  <meta name="twitter:description" content="${esc(FALLBACK_DESC)}" />
+  <meta name="twitter:description" content="${esc(desc)}" />
   <meta name="twitter:image" content="${esc(image)}" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
@@ -80,8 +116,8 @@ module.exports = async (req, res) => {
 <body>
   <div class="card">
     <h1>${esc(pageTitle)}</h1>
-    <p>Taking you to the video…</p>
-    <p><a href="${esc(pageUrl)}">Continue to the video →</a></p>
+    <p>${esc(takingTo)}</p>
+    <p><a href="${esc(pageUrl)}">${esc(cta)}</a></p>
   </div>
   <script>window.location.replace(${JSON.stringify(pageUrl)});</script>
 </body>
@@ -90,4 +126,4 @@ module.exports = async (req, res) => {
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'public, max-age=3600');
   return res.status(200).send(html);
-};
+}

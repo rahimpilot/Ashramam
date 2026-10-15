@@ -18,6 +18,7 @@ import StyledByMafi from './StyledByMafi';
 import OurCinemas from './OurCinemas';
 import Podcasts from './Podcasts';
 import SomeMoments from './SomeMoments';
+import SomeMomentArticle from './SomeMomentArticle';
 import VoiceRoom from './VoiceRoom';
 import Radio from './Radio';
 import UnoGame from './UnoGame';
@@ -140,6 +141,7 @@ function AnimatedRoutes() {
         <Route path="/style-by-mafi/:topicSlug" element={<Navigate to="/styledbymafi" replace />} />
         <Route path="/podcasts" element={<RequireAuth><Podcasts /></RequireAuth>} />
         <Route path="/some-moment" element={<RequireAuth><SomeMoments /></RequireAuth>} />
+        <Route path="/some-moment/:articleSlug" element={<RequireAuth><SomeMomentArticle /></RequireAuth>} />
         <Route path="/voice-room" element={<RequireAuth><VoiceRoom /></RequireAuth>} />
         <Route path="/radio" element={<RequireAuth><Radio /></RequireAuth>} />
         <Route path="/our-trips" element={<RequireAuth><OurTrips /></RequireAuth>} />
