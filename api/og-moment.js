@@ -25,9 +25,17 @@ const MOMENTS = {
 
 // Mirror of the article catalog in src/someMomentArticles.ts (slug -> { title, image }).
 const ARTICLES = {
+  'team-sensorium': {
+    title: 'Team Sensorium',
+    image: `${SITE}/images/team-sensorium.jpg`,
+    imgW: 640,
+    imgH: 640,
+  },
   'soccer-players': {
     title: 'Foot Ball Players',
     image: `${SITE}/images/soccer-players.jpg`,
+    imgW: 1280,
+    imgH: 960,
   },
 };
 
@@ -53,8 +61,8 @@ module.exports = async (req, res) => {
       desc: FALLBACK_ARTICLE_DESC,
       pageUrl: `${SITE}/some-moment/${encodeURIComponent(articleSlug)}${vParam('?')}`,
       image: art.image,
-      imgW: 1280,
-      imgH: 960,
+      imgW: art.imgW || 1280,
+      imgH: art.imgH || 960,
       cta: 'Continue to the story →',
       takingTo: 'Taking you to the story…',
     });

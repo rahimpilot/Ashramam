@@ -16,6 +16,17 @@ export interface MomentArticle {
 
 export const MOMENT_ARTICLES: MomentArticle[] = [
   {
+    slug: 'team-sensorium',
+    title: 'Team Sensorium',
+    image: '/images/team-sensorium.jpg',
+    paragraphs: [
+      'They called themselves Team Sensorium \u2014 three guys who lived together in some random galli of Thrissur, and were, to put it politely, completely non-predictable. Chilling, funny, and always up to something. Their flat was basically an open house \u2014 friends were welcomed in for all kinds of unusual activities. Shylock, as usual, appointed himself the accounting manager of the house, and somehow ended up managing the other two guys as well.',
+      'The three of them had their own circle of good friends to hang out with and go on trips with, and the good times just kept rolling. Their friendship was ridiculously strong \u2014 built entirely on fun. And when it actually mattered, they stood by each other through everything, no matter the situation.',
+      'Then came the incident that made them village-famous. One fine day, one of the guys went riding his Yamaha drunk, with his Mangalore partner in crime \u2014 and ended up literally smooching a stone. The whole village heard about it. Those were the days. The guys became too famous.',
+      'Back at Sensorium, they played together, ate together, sang together \u2014 etcetera, etcetera, etcetera. One of the guys was smart enough to \u201cscore\u201d stuff whenever the situation demanded, and that story is famous in the village too. Jokes apart \u2014 they are true friends. They don\u2019t meet each other much these days, but they still cherish those naughty times from their younger, wilder days.',
+    ],
+  },
+  {
     slug: 'soccer-players',
     title: 'Foot Ball Players',
     image: '/images/soccer-players.jpg',
