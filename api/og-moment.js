@@ -26,7 +26,7 @@ const MOMENTS = {
 // Mirror of the article catalog in src/someMomentArticles.ts (slug -> { title, image }).
 const ARTICLES = {
   'soccer-players': {
-    title: 'Soccer Players',
+    title: 'Foot Ball Players',
     image: `${SITE}/images/soccer-players.jpg`,
   },
 };

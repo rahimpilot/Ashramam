@@ -17,7 +17,7 @@ export interface MomentArticle {
 export const MOMENT_ARTICLES: MomentArticle[] = [
   {
     slug: 'soccer-players',
-    title: 'Soccer Players',
+    title: 'Foot Ball Players',
     image: '/images/soccer-players.jpg',
     paragraphs: [
       'Those were the days \u2014 Ashramam used to play football hard until late into the night, all in the name of fun and health. And on the way back home, there was always the mandatory pit stop at Eepan and the Kadavu restaurant. This went on for quite a while, and we kept calling the whole thing \u201chealthy\u201d \u2014 because, hey, we were playing soccer every now and then\u2026 even though we broke Bruno\u2019s leg and split Hyder\u2019s lip along the way. No big deal.',
