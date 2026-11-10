@@ -20,6 +20,7 @@ export const MOMENT_ARTICLES: MomentArticle[] = [
   {
     slug: 'roy-is-back-in-instagram',
     title: 'Roy Is Back in Instagram',
+    image: '/images/roy-is-back-in-instagram.jpg',
     paragraphs: [
       'Riyaz Ummer is back on Instagram. After staying away from social media for a long, long time, the man himself has finally returned \u2014 and not quietly, either. Stories, reels, posts\u2026 the full comeback tour is officially on.',
       'For years, whenever anyone mentioned a video on Facebook, Riyaz had one answer ready, delivered with maximum sarcasm: \u201cSorry bro, I am not in FB anymore.\u201d Mehroof, Asif, Marzook, Nias \u2014 everyone who dared to ask the same question again got the same treatment. Riyaz would throw the question right back at them, repeating their own concern with a perfectly straight face, just to watch them squirm.',
