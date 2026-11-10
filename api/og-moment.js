@@ -27,9 +27,13 @@ const MOMENTS = {
 const ARTICLES = {
   'roy-is-back-in-instagram': {
     title: 'Roy Is Back in Instagram',
-    image: `${SITE}/images/roy-is-back-in-instagram.jpg`,
-    imgW: 1152,
-    imgH: 2048,
+    // Landscape 1200x630 version of the tall portrait photo: WhatsApp's
+    // crawler renders very tall (9:16) og:images unreliably, so the preview
+    // card uses this blurred-background fit. The article itself keeps the
+    // full portrait photo.
+    image: `${SITE}/images/roy-is-back-in-instagram-og.jpg`,
+    imgW: 1200,
+    imgH: 630,
   },
   'team-sensorium': {
     title: 'Team Sensorium',

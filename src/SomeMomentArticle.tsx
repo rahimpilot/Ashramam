@@ -13,8 +13,8 @@ const SomeMomentArticle: React.FC = () => {
 
   const copyArticleLink = async () => {
     if (!article) return;
-    // ?v=1 busts WhatsApp's aggressive preview cache — bump on stale previews.
-    const url = `https://www.ashramamvibes.com/some-moment/${article.slug}?v=1`;
+    // ?v=2 busts WhatsApp's aggressive preview cache — bump on stale previews.
+    const url = `https://www.ashramamvibes.com/some-moment/${article.slug}?v=2`;
     try {
       await navigator.clipboard.writeText(url);
     } catch {
