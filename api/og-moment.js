@@ -24,6 +24,8 @@ const MOMENTS = {
 };
 
 // Mirror of the article catalog in src/someMomentArticles.ts (slug -> { title, image }).
+// Article share links carry ?v=2 (bumped 2026-11-09) so WhatsApp fetches a
+// fresh preview card instead of its cached one.
 const ARTICLES = {
   'roy-is-back-in-instagram': {
     title: 'Roy Is Back in Instagram',
