@@ -25,6 +25,14 @@ const MOMENTS = {
 
 // Mirror of the article catalog in src/someMomentArticles.ts (slug -> { title, image }).
 const ARTICLES = {
+  // Photo arrives later — Ray is finding one. Until then the preview card
+  // uses the generic Some Moments image; swap image + dims when it lands.
+  'roy-is-back-in-instagram': {
+    title: 'Roy Is Back in Instagram',
+    image: `${SITE}/videos/selfie-fight-2017-thumb.jpg`,
+    imgW: 1080,
+    imgH: 1080,
+  },
   'team-sensorium': {
     title: 'Team Sensorium',
     image: `${SITE}/images/team-sensorium.jpg`,

@@ -237,16 +237,32 @@ const SomeMoments: React.FC = () => {
               cursor: 'pointer'
             }}
           >
-            <img
-              src={a.image}
-              alt={a.title}
-              style={{
+            {a.image ? (
+              <img
+                src={a.image}
+                alt={a.title}
+                style={{
+                  width: '100%',
+                  display: 'block',
+                  borderRadius: '8px',
+                  marginBottom: '12px'
+                }}
+              />
+            ) : (
+              <div style={{
                 width: '100%',
-                display: 'block',
                 borderRadius: '8px',
-                marginBottom: '12px'
-              }}
-            />
+                marginBottom: '12px',
+                padding: '48px 16px',
+                textAlign: 'center',
+                background: 'linear-gradient(135deg, #d9d4e9 0%, #f0ebf9 100%)',
+                color: '#555555',
+                fontSize: '14px'
+              }}>
+                <div style={{ fontSize: '36px', marginBottom: '8px' }}>📸</div>
+                Photo coming soon
+              </div>
+            )}
             <h3 style={{
               fontSize: '18px',
               fontWeight: 400,

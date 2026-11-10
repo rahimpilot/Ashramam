@@ -8,13 +8,24 @@
 export interface MomentArticle {
   slug: string;
   title: string;
-  /** Bundled photo — shown on the card and at the top of the article. */
-  image: string;
+  /** Bundled photo — shown on the card and at the top of the article.
+   *  Optional: an article can go live before its photo arrives (Ray sends
+   *  the picture later); the card shows a "Photo coming soon" tile. */
+  image?: string;
   /** Story paragraphs, in order. */
   paragraphs: string[];
 }
 
 export const MOMENT_ARTICLES: MomentArticle[] = [
+  {
+    slug: 'roy-is-back-in-instagram',
+    title: 'Roy Is Back in Instagram',
+    paragraphs: [
+      'Riyaz Ummer is back on Instagram. After staying away from social media for a long, long time, the man himself has finally returned \u2014 and not quietly, either. Stories, reels, posts\u2026 the full comeback tour is officially on.',
+      'For years, whenever anyone mentioned a video on Facebook, Riyaz had one answer ready, delivered with maximum sarcasm: \u201cSorry bro, I am not in FB anymore.\u201d Mehroof, Asif, Marzook, Nias \u2014 everyone who dared to ask the same question again got the same treatment. Riyaz would throw the question right back at them, repeating their own concern with a perfectly straight face, just to watch them squirm.',
+      'And now? Now he is the one posting. The man who was \u201cnot in FB anymore\u201d is suddenly all over Instagram \u2014 stories every day, reels, posts, the works. The bullying has officially gone full circle: now the friends get to ask him, \u201cBro, did you see my story?\u201d \u2014 and wait for his answer.',
+    ],
+  },
   {
     slug: 'team-sensorium',
     title: 'Team Sensorium',

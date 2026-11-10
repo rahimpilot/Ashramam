@@ -117,16 +117,18 @@ const SomeMomentArticle: React.FC = () => {
                 {copied ? <span style={{ color: '#1c9c4c' }}>✓</span> : '🔗'}
               </button>
             </div>
-            <img
-              src={article.image}
-              alt={article.title}
-              style={{
-                width: '100%',
-                display: 'block',
-                borderRadius: '8px',
-                marginBottom: '16px'
-              }}
-            />
+            {article.image && (
+              <img
+                src={article.image}
+                alt={article.title}
+                style={{
+                  width: '100%',
+                  display: 'block',
+                  borderRadius: '8px',
+                  marginBottom: '16px'
+                }}
+              />
+            )}
             {article.paragraphs.map((p, i) => (
               <p
                 key={i}
