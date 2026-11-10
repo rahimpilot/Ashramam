@@ -29,7 +29,9 @@ const StoryEngagement: React.FC<{
   user: User | null;
   collectionName?: string;
   emptyText?: string;
-}> = ({ storyId, user, collectionName = 'exclusiveStories', emptyText = 'No comments yet — be the first to roast… err, congratulate. 😄' }) => {
+  /** The copy-link row — hide it where the page already has its own share button. */
+  showCopyLink?: boolean;
+}> = ({ storyId, user, collectionName = 'exclusiveStories', emptyText = 'No comments yet — be the first to roast… err, congratulate. 😄', showCopyLink = true }) => {
   const [comments, setComments] = useState<StoryComment[]>([]);
   const [authorName, setAuthorName] = useState('');
   const [newComment, setNewComment] = useState('');
@@ -119,6 +121,7 @@ const StoryEngagement: React.FC<{
   return (
     <div>
       {/* Copy link row */}
+      {showCopyLink && (
       <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginTop: 14 }}>
         <button
           onClick={copyLink}
@@ -135,6 +138,7 @@ const StoryEngagement: React.FC<{
           {copied ? 'Link copied!' : 'Copy link'}
         </button>
       </div>
+      )}
 
       {/* Comments */}
       <div className="iv-card" style={{ marginTop: 14, padding: 16 }}>

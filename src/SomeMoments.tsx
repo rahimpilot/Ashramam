@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import BottomNavigation from './BottomNavigation';
+import StoryEngagement from './StoryEngagement';
 import { MOMENT_ARTICLES } from './someMomentArticles';
+import { auth } from './firebase';
+import { onAuthStateChanged, User } from 'firebase/auth';
 
 interface Moment {
   slug: string;
@@ -30,7 +33,8 @@ const MomentCard: React.FC<{
   m: Moment;
   copied: boolean;
   onCopy: () => void;
-}> = ({ m, copied, onCopy }) => {
+  user: User | null;
+}> = ({ m, copied, onCopy, user }) => {
   const videoRef = React.useRef<HTMLVideoElement | null>(null);
 
   const toggleFullscreen = () => {
@@ -142,6 +146,14 @@ const MomentCard: React.FC<{
           ⛶
         </button>
       </div>
+      {/* Comments — residents comment right below the video. */}
+      <StoryEngagement
+        storyId={m.slug}
+        user={user}
+        collectionName="someMoments"
+        showCopyLink={false}
+        emptyText="No comments yet — be the first to share your thoughts."
+      />
     </div>
   );
 };
@@ -151,6 +163,13 @@ const SomeMoments: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+
+  // Current member, for the comments box (page is members-only already).
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, setUser);
+    return () => unsub();
+  }, []);
 
   // A shared link like /some-moment?m=<slug> scrolls straight to that video.
   useEffect(() => {
@@ -312,6 +331,7 @@ const SomeMoments: React.FC = () => {
             m={m}
             copied={copiedSlug === m.slug}
             onCopy={() => copyMomentLink(m)}
+            user={user}
           />
         ))}
       </div>

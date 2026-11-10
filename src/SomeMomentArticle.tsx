@@ -1,13 +1,23 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import BottomNavigation from './BottomNavigation';
+import StoryEngagement from './StoryEngagement';
 import { MOMENT_ARTICLES } from './someMomentArticles';
+import { auth } from './firebase';
+import { onAuthStateChanged, User } from 'firebase/auth';
 
 /** A single Some Moments photo article — members only. */
 const SomeMomentArticle: React.FC = () => {
   const navigate = useNavigate();
   const { articleSlug } = useParams<{ articleSlug: string }>();
   const [copied, setCopied] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+
+  // Current member, for the comments box (page is members-only already).
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, setUser);
+    return () => unsub();
+  }, []);
 
   const article = MOMENT_ARTICLES.find((a) => a.slug === articleSlug);
 
@@ -133,6 +143,14 @@ const SomeMomentArticle: React.FC = () => {
                 {p}
               </p>
             ))}
+            {/* Comments — residents comment right below the story. */}
+            <StoryEngagement
+              storyId={article.slug}
+              user={user}
+              collectionName="someMoments"
+              showCopyLink={false}
+              emptyText="No comments yet — be the first to share your thoughts."
+            />
           </div>
         )}
       </div>
