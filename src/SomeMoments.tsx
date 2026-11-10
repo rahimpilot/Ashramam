@@ -239,11 +239,10 @@ const SomeMoments: React.FC = () => {
           >
             {a.image ? (
               <img
+                className="moment-article-img"
                 src={a.image}
                 alt={a.title}
                 style={{
-                  width: '100%',
-                  display: 'block',
                   borderRadius: '8px',
                   marginBottom: '12px'
                 }}
