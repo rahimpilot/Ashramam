@@ -9,6 +9,8 @@ const ROOM_ID = 'happening-now-room';
 
 interface Tile {
   icon: string;
+  /** Optional picture replacing the emoji icon (e.g. the comic Moments theme). */
+  iconImage?: string;
   title: string;
   subtitle: string;
   path: string;
@@ -25,6 +27,7 @@ const TILES: Tile[] = [
   },
   {
     icon: '📹',
+    iconImage: '/images/some-moments-tile.webp',
     title: 'Some Moments',
     subtitle: 'Short videos from the crew',
     path: '/some-moment',
@@ -457,9 +460,18 @@ const Hangout: React.FC = () => {
                   justifyContent: 'center',
                   fontSize: '24px',
                   marginBottom: '13px',
-                  flexShrink: 0
+                  flexShrink: 0,
+                  overflow: 'hidden'
                 }}>
-                  {tile.icon}
+                  {tile.iconImage ? (
+                    <img
+                      src={tile.iconImage}
+                      alt=""
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    />
+                  ) : (
+                    tile.icon
+                  )}
                 </div>
                 <div className="ht-text" style={{ flex: 1, minWidth: 0 }}>
                   <div className="ht-title" style={{

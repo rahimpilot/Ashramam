@@ -359,26 +359,31 @@ select:focus {
   }
 }
 
-/* Some Moments article photos: full width on phones, so a portrait photo
-   reads naturally; on tablets/desktops a tall photo is capped and centred
-   so the story stays in reach instead of running two screens tall. */
+/* Some Moments article photos: sized so residents can skim through the
+   list and the story stays in reach on every screen.
+   Mobile: 65% of the card, centred. Tablet: 55%. Desktop: half the
+   card width (50%), centred. Tall (portrait) photos also get a height
+   cap on tablet/desktop so they never run two screens tall. */
 .moment-article-img {
-  width: 100%;
+  width: 65%;
+  max-width: 65%;
   height: auto;
   display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 @media (min-width: 768px) {
   .moment-article-img {
-    width: auto;
-    max-width: 100%;
-    max-height: 560px;
-    margin-left: auto;
-    margin-right: auto;
+    width: 55%;
+    max-width: 55%;
+    max-height: 520px;
     object-fit: contain;
   }
 }
 @media (min-width: 1024px) {
   .moment-article-img {
+    width: 50%;
+    max-width: 50%;
     max-height: 640px;
   }
 }
