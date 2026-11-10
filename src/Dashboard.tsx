@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { auth, db, storage } from './firebase';
-import { doc, getDoc, collection, getDocs, setDoc, updateDoc, query, orderBy, Timestamp } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, setDoc, updateDoc, query, orderBy, Timestamp, arrayUnion, arrayRemove, increment } from 'firebase/firestore';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { ref, deleteObject } from 'firebase/storage';
 import { useNavigate } from 'react-router-dom';
@@ -138,6 +138,10 @@ const Dashboard: React.FC = () => {
   const [userProfile, setUserProfile] = useState<UserProfile>({});
   const [loading, setLoading] = useState(true);
   const [scrapPosts, setScrapPosts] = useState<ScrapPost[]>([]);
+  // Posts with a like write in flight — taps are ignored until it lands,
+  // so a quick double-tap can't read stale likes and undo itself.
+  const likingRef = useRef<Set<string>>(new Set());
+  const [likingPosts, setLikingPosts] = useState<Record<string, boolean>>({});
   const [newMessage, setNewMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -467,38 +471,47 @@ const Dashboard: React.FC = () => {
     setImagePreview(null);
   };
 
-  // Like post handler
+  // Like post handler — optimistic: the button updates instantly from the
+  // local post, then one atomic Firestore write confirms it. A write already
+  // in flight for this post ignores further taps, so a quick double-tap
+  // can't read stale likes and undo itself. On failure the UI reverts.
   const handleLike = async (postId: string) => {
-    if (!user?.email) return;
+    if (!user?.email || likingRef.current.has(postId)) return;
+    const userEmail = user.email;
+    const post = scrapPosts.find((p) => p.id === postId);
+    if (!post) return;
+    const alreadyLiked = (post.likes || []).includes(userEmail);
+    const newLikes = alreadyLiked
+      ? (post.likes || []).filter((email: string) => email !== userEmail)
+      : [...(post.likes || []), userEmail];
+
     tapMedium();
     setLikePop(postId);
     setTimeout(() => setLikePop(null), 400);
-    
+    likingRef.current.add(postId);
+    setLikingPosts((prev) => ({ ...prev, [postId]: true }));
+    setScrapPosts((prev) =>
+      prev.map((p) => (p.id === postId ? { ...p, likes: newLikes, likeCount: newLikes.length } : p))
+    );
+
     try {
-      const postRef = doc(db, 'scrapbook', postId);
-      const postSnap = await getDoc(postRef);
-      
-      if (postSnap.exists()) {
-        const postData = postSnap.data();
-        const likes = postData.likes || [];
-        const userEmail = user.email;
-        
-        let updatedLikes;
-        if (likes.includes(userEmail)) {
-          updatedLikes = likes.filter((email: string) => email !== userEmail);
-        } else {
-          updatedLikes = [...likes, userEmail];
-        }
-        
-        await updateDoc(postRef, {
-          likes: updatedLikes,
-          likeCount: updatedLikes.length
-        });
-        
-        fetchScrapPosts();
-      }
+      await updateDoc(doc(db, 'scrapbook', postId), {
+        likes: alreadyLiked ? arrayRemove(userEmail) : arrayUnion(userEmail),
+        likeCount: increment(alreadyLiked ? -1 : 1),
+      });
+      fetchScrapPosts();
     } catch (error) {
       console.error('Error toggling like:', error);
+      setScrapPosts((prev) =>
+        prev.map((p) => (p.id === postId ? { ...p, likes: post.likes || [], likeCount: post.likeCount } : p))
+      );
+    } finally {
+      likingRef.current.delete(postId);
+      setLikingPosts((prev) => {
+        const next = { ...prev };
+        delete next[postId];
+        return next;
+      });
     }
   };
 
@@ -1604,7 +1617,8 @@ const Dashboard: React.FC = () => {
                         color: post.likes?.includes(user?.email || '') ? '#ffffff' : '#2f7fc4',
                         fontSize: '13px',
                         fontWeight: 700,
-                        cursor: 'pointer',
+                        cursor: likingPosts[post.id] ? 'wait' : 'pointer',
+                        opacity: likingPosts[post.id] ? 0.7 : 1,
                         padding: '8px 16px',
                         borderRadius: '999px',
                         display: 'flex',
