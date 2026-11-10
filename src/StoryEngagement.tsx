@@ -36,6 +36,7 @@ const StoryEngagement: React.FC<{
   const [authorName, setAuthorName] = useState('');
   const [newComment, setNewComment] = useState('');
   const [posting, setPosting] = useState(false);
+  const [postError, setPostError] = useState('');
   const [copied, setCopied] = useState(false);
 
   // Resolve display name from profiles (same pattern as Stories)
@@ -79,6 +80,7 @@ const StoryEngagement: React.FC<{
     // fall back the same way the placeholder does.
     const name = authorName || user.displayName || user.email?.split('@')[0] || 'Member';
     setPosting(true);
+    setPostError('');
     try {
       await addDoc(collection(db, collectionName, storyId, 'comments'), {
         uid: user.uid,
@@ -90,6 +92,8 @@ const StoryEngagement: React.FC<{
       setNewComment('');
     } catch (e) {
       console.error('Comment failed', e);
+      // Never fail silently — a dead Post button with no message looks broken.
+      setPostError('Could not post your comment — please try again. If it keeps failing, the site rules may need updating.');
     } finally {
       setPosting(false);
     }
@@ -171,7 +175,8 @@ const StoryEngagement: React.FC<{
 
         {/* Comment input — members only */}
         {user ? (
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div>
+            <div style={{ display: 'flex', gap: 8 }}>
             <input
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
@@ -196,6 +201,10 @@ const StoryEngagement: React.FC<{
             >
               {posting ? '…' : 'Post'}
             </button>
+            </div>
+            {postError && (
+              <p style={{ fontSize: 13, color: '#b91c1c', margin: '8px 0 0 0' }}>{postError}</p>
+            )}
           </div>
         ) : (
           <p style={{ fontSize: 13, color: '#8a9aab', margin: 0 }}>
