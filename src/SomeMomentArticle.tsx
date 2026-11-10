@@ -89,18 +89,10 @@ const SomeMomentArticle: React.FC = () => {
             <div style={{
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between',
+              justifyContent: 'flex-end',
               marginBottom: '12px',
               gap: '12px'
             }}>
-              <h1 style={{
-                fontSize: '24px',
-                fontWeight: 400,
-                color: '#111111',
-                margin: 0
-              }}>
-                {article.title}
-              </h1>
               <button
                 onClick={copyArticleLink}
                 title="Copy link"

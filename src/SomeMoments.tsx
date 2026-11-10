@@ -69,7 +69,9 @@ const MomentCard: React.FC<{
           fontSize: '18px',
           fontWeight: 400,
           color: '#111111',
-          margin: 0
+          margin: 0,
+          flex: 1,
+          textAlign: 'center'
         }}>
           {m.title}
           {m.year && (
@@ -266,7 +268,8 @@ const SomeMoments: React.FC = () => {
               fontSize: '18px',
               fontWeight: 400,
               color: '#2f7fc4',
-              margin: 0
+              margin: 0,
+              textAlign: 'center'
             }}>
               {a.title}
             </h3>
