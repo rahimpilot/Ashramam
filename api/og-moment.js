@@ -27,6 +27,16 @@ const MOMENTS = {
 // Article share links carry ?v=2 (bumped 2026-11-09) so WhatsApp fetches a
 // fresh preview card instead of its cached one.
 const ARTICLES = {
+  'hyder-in-mosque': {
+    title: 'Hyder in Mosque',
+    // Landscape 1200x630 version of the tall portrait photo: WhatsApp's
+    // crawler renders very tall (3:4) og:images unreliably, so the preview
+    // card uses this blurred-background fit. The article itself keeps the
+    // full portrait photo.
+    image: `${SITE}/images/hyder-in-mosque-og.jpg`,
+    imgW: 1200,
+    imgH: 630,
+  },
   'roy-is-back-in-instagram': {
     title: 'Roy Is Back in Instagram',
     // Landscape 1200x630 version of the tall portrait photo: WhatsApp's

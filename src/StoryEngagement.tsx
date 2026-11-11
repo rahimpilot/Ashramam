@@ -39,6 +39,10 @@ const StoryEngagement: React.FC<{
   const [posting, setPosting] = useState(false);
   const [postError, setPostError] = useState('');
   const [copied, setCopied] = useState(false);
+  // Comment id awaiting a second tap to confirm deletion — native
+  // window.confirm dialogs don't surface reliably in embedded/mobile
+  // browsers, so deletion confirms inline instead.
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   // Resolve display name from profiles (same pattern as Stories)
   useEffect(() => {
@@ -100,9 +104,16 @@ const StoryEngagement: React.FC<{
     }
   };
 
+  // Two taps to delete: first tap arms the button ("Sure?"), second tap
+  // deletes. No native confirm dialog — those don't surface reliably in
+  // embedded/mobile browsers.
   const deleteComment = async (commentId: string) => {
     if (!user) return;
-    if (!window.confirm('Delete this comment?')) return;
+    if (confirmDeleteId !== commentId) {
+      setConfirmDeleteId(commentId);
+      return;
+    }
+    setConfirmDeleteId(null);
     try {
       await deleteDoc(doc(db, collectionName, storyId, 'comments', commentId));
     } catch (e) {
@@ -186,11 +197,17 @@ const StoryEngagement: React.FC<{
                       onClick={() => deleteComment(c.id)}
                       className="iv-press"
                       style={{
-                        background: 'none', border: 'none', padding: 0,
-                        fontSize: 12, color: '#b91c1c', cursor: 'pointer'
+                        background: confirmDeleteId === c.id ? '#b91c1c' : 'none',
+                        border: 'none',
+                        borderRadius: confirmDeleteId === c.id ? 12 : 0,
+                        padding: confirmDeleteId === c.id ? '2px 8px' : 0,
+                        fontSize: 12,
+                        color: confirmDeleteId === c.id ? '#ffffff' : '#b91c1c',
+                        fontWeight: confirmDeleteId === c.id ? 700 : 400,
+                        cursor: 'pointer'
                       }}
                     >
-                      Delete
+                      {confirmDeleteId === c.id ? 'Tap again to delete' : 'Delete'}
                     </button>
                   </div>
                 )}

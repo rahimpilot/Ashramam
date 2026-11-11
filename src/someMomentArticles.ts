@@ -18,6 +18,17 @@ export interface MomentArticle {
 
 export const MOMENT_ARTICLES: MomentArticle[] = [
   {
+    slug: 'hyder-in-mosque',
+    title: 'Hyder in Mosque',
+    image: '/images/hyder-in-mosque.jpg',
+    paragraphs: [
+      'Nobody saw this coming. Not us, not Doha, and definitely not Hyder himself. There he was \u2014 Mohammed Hyder, of all people \u2014 walking towards a mosque in Doha, looking for all the world like a man on his way to pray. Accident? Mistake? A wrong turn on the way to somewhere far more Hyder? We may never know.',
+      'To be fair, Hyder visits Doha often. Officially, it is business. Unofficially, it is also where his partner-in-crime lives \u2014 his naughty Umrah friend, the one who finishes Umrah and immediately flees to Goa, Thailand, Colombo, and wherever else the fun is hiding. Some people collect air miles. These two collect escapes.',
+      'Ask them what they believe in and you will get a shrug. They are neither religious nor atheist \u2014 they simply have not decided yet, and they are in no hurry to. One thing they do know: they want fun, and they want naughtiness. Preferably both. Preferably soon.',
+      'And now Hyder is off again \u2014 another Umrah trip, he says. Nobody is betting against the second half of that sentence: Umrah first, a leisure trip right after. For sure. With Hyder, the pilgrimage is real. The holiday after it is just\u2026 also real.',
+    ],
+  },
+  {
     slug: 'roy-is-back-in-instagram',
     title: 'Roy Is Back in Instagram',
     image: '/images/roy-is-back-in-instagram.jpg',
