@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { db } from './firebase';
 import { User } from 'firebase/auth';
 import {
-  collection, addDoc,
+  collection, addDoc, deleteDoc, doc,
   query, orderBy, onSnapshot, Timestamp, getDocs
 } from 'firebase/firestore';
 
 interface StoryComment {
   id: string;
+  uid?: string;
   authorName: string;
   email?: string;
   text: string;
@@ -99,6 +100,17 @@ const StoryEngagement: React.FC<{
     }
   };
 
+  const deleteComment = async (commentId: string) => {
+    if (!user) return;
+    if (!window.confirm('Delete this comment?')) return;
+    try {
+      await deleteDoc(doc(db, collectionName, storyId, 'comments', commentId));
+    } catch (e) {
+      console.error('Delete comment failed', e);
+      setPostError('Could not delete your comment — please try again.');
+    }
+  };
+
   const copyLink = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
@@ -168,6 +180,20 @@ const StoryEngagement: React.FC<{
                 <p style={{ margin: 0, fontSize: 14, color: '#3d4b5c', lineHeight: 1.55, whiteSpace: 'pre-line' }}>
                   {c.text}
                 </p>
+                {user && c.uid === user.uid && (
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 6 }}>
+                    <button
+                      onClick={() => deleteComment(c.id)}
+                      className="iv-press"
+                      style={{
+                        background: 'none', border: 'none', padding: 0,
+                        fontSize: 12, color: '#b91c1c', cursor: 'pointer'
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
