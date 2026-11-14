@@ -18,6 +18,17 @@ export interface MomentArticle {
 
 export const MOMENT_ARTICLES: MomentArticle[] = [
   {
+    slug: 'always-charmer',
+    title: 'Always Charmer',
+    image: '/images/always-charmer.jpg',
+    paragraphs: [
+      'Some people grow up. Asif Madheena simply refused. He lived his youth like no one else did \u2014 Kochi, Punnayoor, Attupuram, Dubai \u2014 and everywhere he went, the fun followed him. Or maybe he followed the fun. With Asif, it was always hard to tell who was chasing whom.',
+      'Back in Vadakkekad and Punnayoor, Asif was the security for his own partyhood \u2014 and what a partyhood it was. He never travelled alone: he had assistants to drive him around, take care of him, and do anything for him. He led a whole young generation, and he took care of them like anything \u2014 feeding them alcohol, leisures, and more leisures. Only leisures. Let\u2019s not get into detail\u2026',
+      'This picture? This is Asif right after one of those naughty, nice moments. Look at that smile. That is the smile of a man who has just had the time of his life and is already planning the next one. That was Asif \u2014 and that is Asif. Some things never change, and honestly, we would not want them to.',
+      'And he was always popping up at the Sensorium boys\u2019 place in Thrissur, for various reasons. Good friends meet each other, right? Right. Asif was \u2014 and always has been \u2014 a gem. The kind of friend who makes every ordinary day feel like a celebration.',
+    ],
+  },
+  {
     slug: 'hyder-in-mosque',
     title: 'Hyder in Mosque',
     image: '/images/hyder-in-mosque.jpg',
