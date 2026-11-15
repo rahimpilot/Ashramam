@@ -464,8 +464,8 @@ const Dashboard: React.FC = () => {
     file.type === 'image/heif' ||
     /\.hei[cf]$/i.test(file.name);
 
-  // A stuck conversion must never wedge the composer — heic2any answers via
-  // a worker message, and a blocked/failed worker never replies at all.
+  // A stuck conversion must never wedge the composer — a blocked/failed
+  // decoder may never reply at all, so the conversion is time-boxed.
   const withTimeout = <T,>(promise: Promise<T>, ms: number): Promise<T> =>
     Promise.race([
       promise,
