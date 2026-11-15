@@ -7,6 +7,8 @@ import BottomNavigation from './BottomNavigation';
 import PageHeader from './PageHeader';
 import { SkeletonStory } from './Skeleton';
 import { tapMedium } from './haptics';
+import { MOMENT_ARTICLES } from './someMomentArticles';
+import { MOMENTS, MomentCard } from './SomeMoments';
 
 interface Story {
   id: string;
@@ -47,6 +49,25 @@ const Stories: React.FC = () => {
   const [copiedStoryId, setCopiedStoryId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [topicSearch, setTopicSearch] = useState('');
+  const [copiedMomentSlug, setCopiedMomentSlug] = useState<string | null>(null);
+
+  // Copy-link for a Some Moments video — same link as on /some-moment, so
+  // shares and WhatsApp previews keep working exactly as before.
+  const copyMomentLink = async (slug: string) => {
+    const url = `https://www.ashramamvibes.com/some-moment?m=${slug}&v=1`;
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = url;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch { /* clipboard unavailable */ }
+      document.body.removeChild(ta);
+    }
+    setCopiedMomentSlug(slug);
+    setTimeout(() => setCopiedMomentSlug(null), 1800);
+  };
 
   // Auth state listener
   useEffect(() => {
@@ -63,6 +84,7 @@ const Stories: React.FC = () => {
   }, [navigate]);
 
   const topics: Topic[] = [
+    { id: 'some-moments', name: 'Some Moments', description: 'Short videos and photo stories from the crew', icon: '📹', color: '#1c1915' },
     { id: 'hydergoa', name: 'Hyder in Goa', description: 'Tales of Hyder\'s Goan escapades', icon: '', color: '#1c1915' }
   ];
 
@@ -748,6 +770,72 @@ const Stories: React.FC = () => {
                 })}
               </div>
             )}
+          </>
+        ) : selectedTopic === 'some-moments' ? (
+          <>
+            {/* Some Moments — the same videos and photo stories as /some-moment,
+                now living here in Stories. Old links, previews and comments
+                are untouched: tapping a card still opens /some-moment/:slug. */}
+            {MOMENT_ARTICLES.map((a) => (
+              <div
+                key={a.slug}
+                onClick={() => navigate(`/some-moment/${a.slug}`)}
+                style={{
+                  background: '#ffffff',
+                  border: '1px solid #d9d9d9',
+                  borderRadius: '12px',
+                  padding: '16px',
+                  marginBottom: '16px',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
+                  cursor: 'pointer'
+                }}
+              >
+                {a.image ? (
+                  <img
+                    className="moment-article-img"
+                    src={a.image}
+                    alt={a.title}
+                    style={{
+                      borderRadius: '8px',
+                      marginBottom: '12px'
+                    }}
+                  />
+                ) : (
+                  <div style={{
+                    width: '100%',
+                    borderRadius: '8px',
+                    marginBottom: '12px',
+                    padding: '48px 16px',
+                    textAlign: 'center',
+                    background: 'linear-gradient(135deg, #d9d4e9 0%, #f0ebf9 100%)',
+                    color: '#555555',
+                    fontSize: '14px'
+                  }}>
+                    <div style={{ fontSize: '36px', marginBottom: '8px' }}>📸</div>
+                    Photo coming soon
+                  </div>
+                )}
+                <h3 style={{
+                  fontSize: '18px',
+                  fontWeight: 400,
+                  color: '#2f7fc4',
+                  margin: 0,
+                  textAlign: 'center'
+                }}>
+                  {a.title}
+                </h3>
+              </div>
+            ))}
+
+            {MOMENTS.map((m) => (
+              <MomentCard
+                key={m.slug}
+                m={m}
+                copied={copiedMomentSlug === m.slug}
+                onCopy={() => copyMomentLink(m.slug)}
+                user={user}
+              />
+            ))}
           </>
         ) : (
           <>

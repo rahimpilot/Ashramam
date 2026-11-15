@@ -26,14 +26,6 @@ const TILES: Tile[] = [
     iconBg: 'rgba(237, 233, 254, 0.85)',
   },
   {
-    icon: '📹',
-    iconImage: '/images/some-moments-tile.webp',
-    title: 'Some Moments',
-    subtitle: 'Short videos from the crew',
-    path: '/some-moment',
-    iconBg: 'rgba(254, 243, 199, 0.85)',
-  },
-  {
     icon: '📖',
     title: 'Articles',
     subtitle: 'Words worth keeping',

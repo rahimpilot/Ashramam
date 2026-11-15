@@ -19,7 +19,7 @@ interface Moment {
  * Ray's short-video corner. He sends each video + title, we publish it here:
  * drop the file in public/videos/ and add one entry below. Newest first.
  */
-const MOMENTS: Moment[] = [
+export const MOMENTS: Moment[] = [
   {
     slug: 'selfie-fight-2017',
     title: 'Selfie Fight',
@@ -29,7 +29,7 @@ const MOMENTS: Moment[] = [
 ];
 
 /** One video card: title + copy-link + player with a Facebook-style full-screen button. */
-const MomentCard: React.FC<{
+export const MomentCard: React.FC<{
   m: Moment;
   copied: boolean;
   onCopy: () => void;
@@ -216,7 +216,7 @@ const SomeMoments: React.FC = () => {
         boxShadow: '0 2px 12px rgba(91, 155, 213, 0.15)'
       }}>
         <button
-          onClick={() => navigate('/hangout')}
+          onClick={() => navigate('/stories')}
           style={{
             background: 'none',
             border: 'none',
