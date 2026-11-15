@@ -149,6 +149,7 @@ const Dashboard: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [convertingImage, setConvertingImage] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
   const [confirmDeletePostId, setConfirmDeletePostId] = useState<string | null>(null);
   const [showComments, setShowComments] = useState<{[postId: string]: boolean}>({});
   const [newComment, setNewComment] = useState<{[postId: string]: string}>({});
@@ -476,6 +477,7 @@ const Dashboard: React.FC = () => {
   const handleImageSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+    setImageError(null);
 
     let imageFile = file;
 
@@ -491,7 +493,8 @@ const Dashboard: React.FC = () => {
         imageFile = new File([blob], file.name.replace(/\.hei[cf]$/i, '.jpg'), { type: 'image/jpeg' });
       } catch (err) {
         console.error('Error converting HEIC image:', err);
-        alert('This photo could not be converted. Please try a different photo.');
+        const detail = err instanceof Error ? err.message : String(err);
+        setImageError(`This photo could not be converted (${detail}). Please try a different photo.`);
         setConvertingImage(false);
         event.target.value = '';
         return;
@@ -511,6 +514,7 @@ const Dashboard: React.FC = () => {
   const removeImage = () => {
     setSelectedImage(null);
     setImagePreview(null);
+    setImageError(null);
   };
 
   // Delete your own post — inline two-tap confirm (native window.confirm
@@ -1353,6 +1357,13 @@ const Dashboard: React.FC = () => {
             {convertingImage && (
               <div style={{ marginTop: '16px', fontSize: '13px', color: '#5b6b7c' }}>
                 Converting photo…
+              </div>
+            )}
+
+            {/* HEIC conversion failed — show the real reason, not a silent drop */}
+            {imageError && (
+              <div style={{ marginTop: '16px', fontSize: '13px', color: '#c0392b' }}>
+                {imageError}
               </div>
             )}
 
