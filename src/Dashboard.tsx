@@ -463,6 +463,16 @@ const Dashboard: React.FC = () => {
     file.type === 'image/heif' ||
     /\.hei[cf]$/i.test(file.name);
 
+  // A stuck conversion must never wedge the composer — heic2any answers via
+  // a worker message, and a blocked/failed worker never replies at all.
+  const withTimeout = <T,>(promise: Promise<T>, ms: number): Promise<T> =>
+    Promise.race([
+      promise,
+      new Promise<T>((_, reject) =>
+        setTimeout(() => reject(new Error('Conversion timed out')), ms)
+      ),
+    ]);
+
   const handleImageSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -473,7 +483,10 @@ const Dashboard: React.FC = () => {
       setConvertingImage(true);
       try {
         const heic2any = (await import('heic2any')).default;
-        const converted = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.85 });
+        const converted = await withTimeout(
+          heic2any({ blob: file, toType: 'image/jpeg', quality: 0.85 }),
+          30000
+        );
         const blob = Array.isArray(converted) ? converted[0] : converted;
         imageFile = new File([blob], file.name.replace(/\.hei[cf]$/i, '.jpg'), { type: 'image/jpeg' });
       } catch (err) {
