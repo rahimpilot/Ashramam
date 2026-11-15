@@ -483,13 +483,42 @@ const Dashboard: React.FC = () => {
 
     if (isHeicFile(file)) {
       setConvertingImage(true);
+      // Let "Converting photo…" paint before the main-thread decode blocks.
+      await new Promise((r) => setTimeout(r, 50));
       try {
-        const heic2any = (await import('heic2any')).default;
-        const converted = await withTimeout(
-          heic2any({ blob: file, toType: 'image/jpeg', quality: 0.85 }),
+        // libheif-js decodes on the main thread — no worker, so no CSP
+        // worker-src dependency (the old heic2any worker never answered).
+        // The decoder binary lives at /libheif.wasm (public/libheif.wasm).
+        const libheifFactory = (await import('libheif-js/libheif-wasm/libheif-bundle.js')).default;
+        const libheif = await withTimeout(
+          Promise.resolve(libheifFactory({ locateFile: () => '/libheif.wasm' })),
           30000
         );
-        const blob = Array.isArray(converted) ? converted[0] : converted;
+        const decoder = new libheif.HeifDecoder();
+        const images = decoder.decode(await file.arrayBuffer());
+        if (!images || images.length === 0) {
+          throw new Error('No image found in this photo');
+        }
+        const image = images[0];
+        const width = image.get_width();
+        const height = image.get_height();
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error('Canvas is not available');
+        const imageData = ctx.createImageData(width, height);
+        await new Promise<void>((resolve, reject) => {
+          image.display(imageData, (displayData) => {
+            if (!displayData) reject(new Error('HEIF processing error'));
+            else resolve();
+          });
+        });
+        ctx.putImageData(imageData, 0, 0);
+        const blob = await new Promise<Blob | null>((resolve) =>
+          canvas.toBlob(resolve, 'image/jpeg', 0.85)
+        );
+        if (!blob) throw new Error('Could not encode the converted photo');
         imageFile = new File([blob], file.name.replace(/\.hei[cf]$/i, '.jpg'), { type: 'image/jpeg' });
       } catch (err) {
         console.error('Error converting HEIC image:', err);
