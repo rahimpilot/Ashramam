@@ -488,7 +488,8 @@ const Dashboard: React.FC = () => {
       try {
         // libheif-js decodes on the main thread — no worker, so no CSP
         // worker-src dependency (the old heic2any worker never answered).
-        // The decoder binary lives at /libheif.wasm (public/libheif.wasm).
+        // The decoder binary lives at /libheif.wasm (public/libheif.wasm),
+        // fetched same-origin, so it needs no CSP change to load.
         const libheifFactory = (await import('libheif-js/libheif-wasm/libheif-bundle.js')).default;
         const libheif = await withTimeout(
           Promise.resolve(libheifFactory({ locateFile: () => '/libheif.wasm' })),
