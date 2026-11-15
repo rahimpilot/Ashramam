@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { auth, db, storage } from './firebase';
-import { doc, getDoc, collection, getDocs, setDoc, updateDoc, query, orderBy, Timestamp, arrayUnion, arrayRemove, increment } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, setDoc, updateDoc, deleteDoc, query, orderBy, Timestamp, arrayUnion, arrayRemove, increment } from 'firebase/firestore';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { ref, deleteObject } from 'firebase/storage';
 import { useNavigate } from 'react-router-dom';
@@ -148,6 +148,8 @@ const Dashboard: React.FC = () => {
   const [userProfiles, setUserProfiles] = useState<{[email: string]: UserProfile}>({});
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [convertingImage, setConvertingImage] = useState(false);
+  const [confirmDeletePostId, setConfirmDeletePostId] = useState<string | null>(null);
   const [showComments, setShowComments] = useState<{[postId: string]: boolean}>({});
   const [newComment, setNewComment] = useState<{[postId: string]: string}>({});
   const [showLikes, setShowLikes] = useState<{[postId: string]: boolean}>({});
@@ -453,22 +455,67 @@ const Dashboard: React.FC = () => {
   };
 
   // Image upload handler
-  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // iPhone photos arrive as HEIC, which browsers (except Safari) cannot draw
+  // into a canvas — the preview breaks and the photo is silently dropped on
+  // post. Convert HEIC/HEIF to JPEG on the device before anything else.
+  const isHeicFile = (file: File) =>
+    file.type === 'image/heic' ||
+    file.type === 'image/heif' ||
+    /\.hei[cf]$/i.test(file.name);
+
+  const handleImageSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      setSelectedImage(file);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImagePreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    let imageFile = file;
+
+    if (isHeicFile(file)) {
+      setConvertingImage(true);
+      try {
+        const heic2any = (await import('heic2any')).default;
+        const converted = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.85 });
+        const blob = Array.isArray(converted) ? converted[0] : converted;
+        imageFile = new File([blob], file.name.replace(/\.hei[cf]$/i, '.jpg'), { type: 'image/jpeg' });
+      } catch (err) {
+        console.error('Error converting HEIC image:', err);
+        alert('This photo could not be converted. Please try a different photo.');
+        setConvertingImage(false);
+        event.target.value = '';
+        return;
+      }
+      setConvertingImage(false);
     }
+
+    setSelectedImage(imageFile);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setImagePreview(e.target?.result as string);
+    };
+    reader.readAsDataURL(imageFile);
   };
 
   // Remove selected image
   const removeImage = () => {
     setSelectedImage(null);
     setImagePreview(null);
+  };
+
+  // Delete your own post — inline two-tap confirm (native window.confirm
+  // never surfaces in embedded/mobile browsers). The photo lives inside the
+  // post document, so deleting the doc removes the photo too.
+  const handleDeletePost = async (postId: string) => {
+    if (confirmDeletePostId !== postId) {
+      setConfirmDeletePostId(postId);
+      return;
+    }
+    setConfirmDeletePostId(null);
+    try {
+      await deleteDoc(doc(db, 'scrapbook', postId));
+      fetchScrapPosts();
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      alert('Failed to delete post. Please try again.');
+    }
   };
 
   // Like post handler — optimistic: the button updates instantly from the
@@ -602,13 +649,17 @@ const Dashboard: React.FC = () => {
           message: editingMessage.trim()
         };
 
-        // Handle image removal
+        // Handle image removal — photos live inside the post document as
+        // base64, so removing one is just clearing the field. Only touch
+        // Firebase Storage for legacy posts whose image is a Storage path.
         if (editingImageRemoved && postData.image) {
-          try {
-            const imageRef = ref(storage, postData.image);
-            await deleteObject(imageRef);
-          } catch (error) {
-            console.error('Error deleting image from storage:', error);
+          if (!postData.image.startsWith('data:')) {
+            try {
+              const imageRef = ref(storage, postData.image);
+              await deleteObject(imageRef);
+            } catch (error) {
+              console.error('Error deleting image from storage:', error);
+            }
           }
           updateData.image = null;
         }
@@ -1285,6 +1336,13 @@ const Dashboard: React.FC = () => {
               </div>
             )}
             
+            {/* Converting (iPhone HEIC → JPEG) */}
+            {convertingImage && (
+              <div style={{ marginTop: '16px', fontSize: '13px', color: '#5b6b7c' }}>
+                Converting photo…
+              </div>
+            )}
+
             {/* Image Preview */}
             {imagePreview && (
               <div style={{ marginTop: '16px', position: 'relative' }}>
@@ -1361,7 +1419,7 @@ const Dashboard: React.FC = () => {
               <button
                 type="submit"
                 className="sb-share-btn"
-                disabled={(!newMessage.trim() && !selectedImage) || submitting}
+                disabled={(!newMessage.trim() && !selectedImage) || submitting || convertingImage}
                 style={{
                   background: (newMessage.trim() || selectedImage) 
                     ? 'linear-gradient(135deg, #5b9bd5 0%, #4a86c8 100%)' 
@@ -1682,6 +1740,29 @@ const Dashboard: React.FC = () => {
                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                       >
                         ✏️ Edit
+                      </button>
+                    )}
+                    {user?.email === post.authorEmail && (
+                      <button
+                        onClick={() => handleDeletePost(post.id)}
+                        style={{
+                          background: confirmDeletePostId === post.id ? '#fde8e8' : 'none',
+                          border: 'none',
+                          color: '#c0392b',
+                          fontSize: '14px',
+                          fontWeight: confirmDeletePostId === post.id ? 600 : 400,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '8px 12px',
+                          borderRadius: '8px',
+                          transition: 'background-color 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#fde8e8'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = confirmDeletePostId === post.id ? '#fde8e8' : 'transparent'}
+                      >
+                        {confirmDeletePostId === post.id ? 'Tap again to delete' : '🗑️ Delete'}
                       </button>
                     )}
                   </div>
