@@ -18,6 +18,19 @@ export interface MomentArticle {
 
 export const MOMENT_ARTICLES: MomentArticle[] = [
   {
+    slug: 'life-is-all-about-sex',
+    title: 'Life Is All About Sex',
+    image: '/images/life-is-all-about-sex.jpg',
+    paragraphs: [
+      'Hyder took the mic, looked out at the respected members of the Ashramam, and announced tonight\u2019s topic. What followed was pure Hyder.',
+      'Dear respected members of the Ashramam\u2026 \uD83D\uDE4F\uD83D\uDE02 Tonight\u2019s topic is: \u201CLife is all about sex.\u201D Finally, a subject for which this group has unlimited opinions and absolutely no reliable statistics.',
+      'Look at the effort humans put in. Gym memberships, expensive perfumes, fancy cars, carefully selected profile pictures\u2026 all that investment just to hear: \u201CYou\u2019re like a brother to me.\u201D \uD83D\uDE02',
+      'We say, \u201CI\u2019m working on myself.\u201D Wonderful. But why does this personal development accelerate immediately after meeting someone attractive? A man will ignore his doctor\u2019s advice to walk for twenty minutes, but if someone says, \u201CNobody\u2019s home,\u201D suddenly he can cross three emirates without a break. \uD83D\uDE97\uD83D\uDE02',
+      'And the confidence! We cannot decide what to order for dinner, but at midnight we\u2019re sending, \u201CI know exactly what you need.\u201D Brother, you don\u2019t even know your own shirt size.',
+      'So yes, desire is a powerful motivator. It has inspired poetry, music, fitness \u2014 and some truly terrible decisions. Thank you. Please collect your wisdom at the exit and leave your browsing history out of the discussion. \uD83C\uDFA4\uD83D\uDE02',
+    ],
+  },
+  {
     slug: 'always-charmer',
     title: 'Always Charmer',
     image: '/images/always-charmer.jpg',
