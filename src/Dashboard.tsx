@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { auth, db, storage } from './firebase';
-import { doc, getDoc, collection, getDocs, setDoc, updateDoc, deleteDoc, query, orderBy, Timestamp, arrayUnion, arrayRemove, increment } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, setDoc, updateDoc, deleteDoc, query, orderBy, Timestamp, arrayUnion, arrayRemove, increment, runTransaction } from 'firebase/firestore';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { ref, deleteObject } from 'firebase/storage';
 import { useNavigate } from 'react-router-dom';
@@ -151,6 +151,7 @@ const Dashboard: React.FC = () => {
   const [convertingImage, setConvertingImage] = useState(false);
   const [imageError, setImageError] = useState<string | null>(null);
   const [confirmDeletePostId, setConfirmDeletePostId] = useState<string | null>(null);
+  const [confirmDeleteCommentId, setConfirmDeleteCommentId] = useState<string | null>(null);
   const [showComments, setShowComments] = useState<{[postId: string]: boolean}>({});
   const [newComment, setNewComment] = useState<{[postId: string]: string}>({});
   const [showLikes, setShowLikes] = useState<{[postId: string]: boolean}>({});
@@ -558,6 +559,9 @@ const Dashboard: React.FC = () => {
     setConfirmDeletePostId(null);
     try {
       await deleteDoc(doc(db, 'scrapbook', postId));
+      // Drop it from the feed at once — the full refetch below also
+      // re-fetches every author's profile, so it can take seconds.
+      setScrapPosts((prev) => prev.filter((p) => p.id !== postId));
       fetchScrapPosts();
     } catch (error) {
       console.error('Error deleting post:', error);
@@ -617,50 +621,89 @@ const Dashboard: React.FC = () => {
     }));
   };
 
+  // Comment add — one atomic write (arrayUnion) so two people commenting at
+  // the same moment can't overwrite each other, plus an optimistic local
+  // append so the comment shows at once instead of after the slow refetch.
   const handleAddComment = async (postId: string) => {
     const comment = newComment[postId]?.trim();
     if (!comment || !user?.email) return;
 
+    const newReply: ScrapReply = {
+      id: Date.now().toString(),
+      message: comment,
+      author: userProfile.name || user.displayName || 'Anonymous User',
+      authorEmail: user.email,
+      createdAt: Timestamp.now()
+    };
+
+    setNewComment(prev => ({ ...prev, [postId]: '' }));
+    setShowCommentMentionDropdown(prev => ({ ...prev, [postId]: false }));
+    setScrapPosts((prev) =>
+      prev.map((p) =>
+        p.id === postId
+          ? { ...p, replies: [...(p.replies || []), newReply], replyCount: (p.replyCount || 0) + 1 }
+          : p
+      )
+    );
+
     try {
-      // Extract mentions from the comment
-      const mentionRegex = /@(\w+(?:\s+\w+)*)/g;
-      const commentMentions = [];
-      let match;
-
-      while ((match = mentionRegex.exec(comment)) !== null) {
-        commentMentions.push(match[1]);
-      }
-
-
-      const postRef = doc(db, 'scrapbook', postId);
-      const postSnap = await getDoc(postRef);
-
-      if (postSnap.exists()) {
-        const postData = postSnap.data();
-        const replies = postData.replies || [];
-
-        const newReply: ScrapReply = {
-          id: Date.now().toString(),
-          message: comment,
-          author: userProfile.name || user.displayName || 'Anonymous User',
-          authorEmail: user.email,
-          createdAt: Timestamp.now()
-        };
-
-        const updatedReplies = [...replies, newReply];
-
-        await updateDoc(postRef, {
-          replies: updatedReplies,
-          replyCount: updatedReplies.length
-        });
-
-        setNewComment(prev => ({ ...prev, [postId]: '' }));
-        setShowCommentMentionDropdown(prev => ({ ...prev, [postId]: false }));
-        fetchScrapPosts();
-
-      }
+      await updateDoc(doc(db, 'scrapbook', postId), {
+        replies: arrayUnion(newReply),
+        replyCount: increment(1),
+      });
+      fetchScrapPosts();
     } catch (error) {
       console.error('Error adding comment:', error);
+      // Roll the optimistic comment back and restore the typed text.
+      setNewComment(prev => ({ ...prev, [postId]: comment }));
+      setScrapPosts((prev) =>
+        prev.map((p) =>
+          p.id === postId
+            ? { ...p, replies: (p.replies || []).filter((r) => r.id !== newReply.id), replyCount: Math.max(0, (p.replyCount || 1) - 1) }
+            : p
+        )
+      );
+    }
+  };
+
+  // Delete your own comment — inline two-tap confirm (native window.confirm
+  // never surfaces in embedded/mobile browsers). A transaction reads the
+  // post and removes the reply in one atomic step, so a comment added at
+  // the same moment can't be lost. Only the comment's author sees the button.
+  const handleDeleteComment = async (postId: string, replyId: string) => {
+    const key = `${postId}:${replyId}`;
+    if (confirmDeleteCommentId !== key) {
+      setConfirmDeleteCommentId(key);
+      return;
+    }
+    setConfirmDeleteCommentId(null);
+    try {
+      const postRef = doc(db, 'scrapbook', postId);
+      const deleted = await runTransaction(db, async (tx) => {
+        const snap = await tx.get(postRef);
+        if (!snap.exists()) return false;
+        const data = snap.data();
+        const replies = (data.replies || []) as ScrapReply[];
+        const target = replies.find((r) => r.id === replyId);
+        if (!target || target.authorEmail !== user?.email) return false;
+        tx.update(postRef, {
+          replies: replies.filter((r) => r.id !== replyId),
+          replyCount: Math.max(0, (data.replyCount || replies.length) - 1),
+        });
+        return true;
+      });
+      if (!deleted) return;
+      setScrapPosts((prev) =>
+        prev.map((p) =>
+          p.id === postId
+            ? { ...p, replies: (p.replies || []).filter((r) => r.id !== replyId), replyCount: Math.max(0, (p.replyCount || (p.replies || []).length) - 1) }
+            : p
+        )
+      );
+      fetchScrapPosts();
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+      alert('Failed to delete comment. Please try again.');
     }
   };
 
@@ -712,6 +755,11 @@ const Dashboard: React.FC = () => {
         }
 
         await updateDoc(postRef, updateData);
+
+        // Show the edit at once instead of waiting for the slow refetch.
+        setScrapPosts((prev) =>
+          prev.map((p) => (p.id === postId ? { ...p, ...updateData } : p))
+        );
 
         setEditingPostId(null);
         setEditingMessage('');
@@ -847,7 +895,11 @@ const Dashboard: React.FC = () => {
 
       const docRef = doc(collection(db, 'scrapbook'));
       await setDoc(docRef, postData);
-      
+
+      // Show the new post at the top at once — the refetch below also
+      // re-fetches every author's profile, so it can take seconds.
+      setScrapPosts((prev) => [{ id: docRef.id, ...postData, image: postData.image ?? undefined } as ScrapPost, ...prev]);
+
       setNewMessage('');
       setSelectedImage(null);
       setImagePreview(null);
@@ -1950,6 +2002,23 @@ const Dashboard: React.FC = () => {
                             <div style={{ fontSize: '11px', color: '#9dafbe', marginTop: '4px' }}>
                               {reply.createdAt.toDate().toLocaleDateString()}
                             </div>
+                            {reply.authorEmail === user?.email && (
+                              <button
+                                onClick={() => handleDeleteComment(post.id, reply.id)}
+                                style={{
+                                  marginTop: '4px',
+                                  padding: '2px 0',
+                                  background: 'none',
+                                  border: 'none',
+                                  cursor: 'pointer',
+                                  fontSize: '12px',
+                                  color: confirmDeleteCommentId === `${post.id}:${reply.id}` ? '#c0392b' : '#9dafbe',
+                                  fontWeight: confirmDeleteCommentId === `${post.id}:${reply.id}` ? 600 : 400,
+                                }}
+                              >
+                                {confirmDeleteCommentId === `${post.id}:${reply.id}` ? 'Tap again to delete' : 'Delete'}
+                              </button>
+                            )}
                           </div>
                         </div>
                       ))}
